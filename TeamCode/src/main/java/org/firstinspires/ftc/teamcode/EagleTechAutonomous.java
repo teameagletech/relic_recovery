@@ -9,9 +9,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.lasarobotics.vision.opmode.VisionOpMode;
+import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.core.Mat;
 
-@Autonomous(name = "EagleTechAutonomous")
-public class EagleTechAutonomous extends OpMode {
+//@Autonomous(name = "EagleTechAutonomous")
+public class EagleTechAutonomous extends VisionOpMode {
 
 //    OpenGLMatrix lastLocation = null;
 
@@ -24,6 +27,8 @@ public class EagleTechAutonomous extends OpMode {
     VuforiaTrackable relicTemplate;
 
     DcMotor wm1, wm2;
+
+    RelicRecoveryVuMark direction = RelicRecoveryVuMark.UNKNOWN;
 
     @Override
     public void init() {
@@ -40,6 +45,8 @@ public class EagleTechAutonomous extends OpMode {
 
         wm1 = hardwareMap.dcMotor.get("wm1");
         wm2 = hardwareMap.dcMotor.get("wm2");
+
+
     }
 
     @Override
@@ -51,20 +58,27 @@ public class EagleTechAutonomous extends OpMode {
     @Override
     public void loop() {
 
-        if (getRuntime() < 1) {
+        if (getRuntime() < 1.1) {
             // Turn around for 1 second
             wm1.setPower(1);
             wm2.setPower(-1);
-        } else {
+        } else if (getRuntime() < 3) {
             // Stop motors
             wm1.setPower(0);
             wm2.setPower(0);
 
-            RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
-            telemetry.addLine(vuMark.name()); // LEFT, RIGHT, CENTER, or UNKNOWN
+            direction = RelicRecoveryVuMark.from(relicTemplate);
+            telemetry.addLine(direction.name()); // LEFT, RIGHT, CENTER, or UNKNOWN
         }
+//        } else if (getRuntime() < )
+
 
         telemetry.update();
+    }
+
+    @Override
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        return super.onCameraFrame(inputFrame);
     }
 
     @Override
