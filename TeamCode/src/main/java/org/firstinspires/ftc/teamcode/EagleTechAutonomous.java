@@ -68,25 +68,16 @@ public class EagleTechAutonomous extends VisionOpMode {
     @Override
     public void loop() {
         super.loop();
-        if (getRuntime() < 1.1) {
-            // Turn around for 1 second
-            wm1.setPower(1);
-            wm2.setPower(-1);
-        } else if (getRuntime() < 3) {
-            // Stop motors
-            wm1.setPower(0);
-            wm2.setPower(0);
+        patternDirection = RelicRecoveryVuMark.from(relicTemplate);
 
-            patternDirection = RelicRecoveryVuMark.from(relicTemplate);
-            telemetry.addLine(patternDirection.name()); // LEFT, RIGHT, CENTER, or UNKNOWN
-            telemetry.addLine(String.valueOf(ballDirection));
-        }
+
         telemetry.update();
 
     }
 
     @Override
     public Mat frame(Mat rgba, Mat gray) {
+        rgba = super.frame(rgba, gray);
         Mat hsv = Mat.zeros(rgba.size(), rgba.type());
         Imgproc.cvtColor(rgba, hsv, Imgproc.COLOR_BGR2HSV);
 
@@ -122,7 +113,7 @@ public class EagleTechAutonomous extends VisionOpMode {
             }
         }
 
-        return hsv;
+        return rgba;
     }
 
     @Override
