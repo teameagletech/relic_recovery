@@ -1,40 +1,64 @@
 package org.firstinspires.ftc.teamcode;
 
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+/**
+ * Created by ishanarya on 11/6/17.
+ */
+
 @TeleOp(name = "EagleTechOpMode")
 public class EagleTechOpMode extends OpMode {
 
-    private DcMotor wm1, wm2;
-    private Servo c1, c2;
-//    private DcMotor slideMotor;
+    private DcMotor rightDrive, leftDrive;
+    private DcMotor pullMotor;
+    private Servo rightHand, leftHand;
+
+    private final double rightHandClosedPosition = 0.518;
+    private final double leftHandClosedPosition = 0.523;
+    private final int pullMotorMaxTurn = 7750;
+    private final int pullMotorMinTurn = 0;
 
     @Override
     public void init() {
-        wm1 = hardwareMap.dcMotor.get("wm1");
-        wm2 = hardwareMap.dcMotor.get("wm2");
-//        slideMotor = hardwareMap.dcMotor.get("sm");
 
-        c1 = hardwareMap.servo.get("c1");
-        c2 = hardwareMap.servo.get("c2");
+        rightDrive = hardwareMap.dcMotor.get("rightDrive");
+        leftDrive = hardwareMap.dcMotor.get("leftDrive");
+        pullMotor = hardwareMap.dcMotor.get("pullMotor");
+
+        rightHand = hardwareMap.servo.get("rightHand");
+        leftHand = hardwareMap.servo.get("leftHand");
+        rightHand.setPosition(0);
+        leftHand.setPosition(1);
+
     }
 
     @Override
     public void loop() {
-        wm1.setPower(gamepad1.left_stick_y);
-        wm2.setPower(gamepad1.right_stick_y);
 
-        if (gamepad1.left_trigger > 0.5) {
-            c1.setPosition(0.5);
-            c2.setPosition(0.5);
+        leftDrive.setPower(gamepad1.left_stick_y);
+        rightDrive.setPower(-gamepad1.right_stick_y);
+
+        if(gamepad1.left_bumper) {
+            rightHand.setPosition(rightHandClosedPosition);
+            leftHand.setPosition(leftHandClosedPosition);
         } else {
-            c1.setPosition(0);
-            c2.setPosition(0.9);
+            rightHand.setPosition(0);
+            leftHand.setPosition(1);
         }
-//        slideMotor.setPower(gamepad1.a ? 1 : (gamepad1.b ? -1 : 0)); // if a, power = 1, if b, power = -1, else 0
+        if(gamepad1.dpad_up) {
+            if(pullMotor.getCurrentPosition() < pullMotorMaxTurn) {
+                pullMotor.setPower(0.5);
+            }
+        } else if(gamepad1.dpad_down) {
+            if(pullMotor.getCurrentPosition() > pullMotorMinTurn) {
+                pullMotor.setPower(-0.5);
+            }
+        } else {
+            pullMotor.setPower(0);
+        }
+        telemetry.addData("Pull Motor Position", pullMotor.getCurrentPosition());
     }
 }
